@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="LeagueTracker.Api/LeagueTracker.Api.csproj" />
+  <Project Path="LeagueTracker.Application/LeagueTracker.Application.csproj" />
+  <Project Path="LeagueTracker.Domain/LeagueTracker.Domain.csproj" />
+  <Project Path="LeagueTracker.Infrastructure/LeagueTracker.Infrastructure.csproj" />
+  <Project Path="LeagueTracker.Tests/LeagueTracker.Tests.csproj" />
+</Solution>

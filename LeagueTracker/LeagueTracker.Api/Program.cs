@@ -1,0 +1,135 @@
+using LeagueTracker.Api.Hubs;
+using LeagueTracker.Api.Middleware;
+using LeagueTracker.Api.Services;
+using LeagueTracker.Application.Interfaces;
+using LeagueTracker.Infrastructure.Data;
+using LeagueTracker.Infrastructure.Identity;
+using LeagueTracker.Infrastructure.Services;
+using LeagueTracker.Infrastructure.Services.Standings;
+using LeagueTracker.Infrastructure.Services.Stats;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
+using System.Text;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddDbContext<LeagueTrackerDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+})
+.AddEntityFrameworkStores<LeagueTrackerDbContext>()
+.AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+    };
+});
+
+builder.Services.AddSignalR();
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+builder.Services.AddScoped<ISportService,SportService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<IPlayerService, PlayerService>();
+
+builder.Services.AddScoped<IStandingsCalculator, TableTennisStandingsCalculator>();
+builder.Services.AddScoped<IStandingsCalculatorFactory, StandingsCalculatorFactory>();
+builder.Services.AddScoped<IStandingsService, StandingsService>();
+
+builder.Services.AddScoped<IPlayerStatsCalculator, TableTennisPlayerStatsCalculator>();
+builder.Services.AddScoped<IPlayerStatsCalculatorFactory, PlayerStatsCalculatorFactory>();
+builder.Services.AddScoped<IPlayerStatsService, PlayerStatsService>();
+
+builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<IMatchService, MatchService>();
+
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddScoped<IMatchNotifier, MatchNotifier>();
+
+builder.Services.AddScoped<ISeasonService, SeasonService>();
+builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
+
+builder.Services.AddScoped<ILeagueService, LeagueService>();
+
+builder.Services.AddControllers();
+
+builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowAngularApp", policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+        });
+});
+
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddOpenApi();
+
+var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<LeagueTrackerDbContext>();
+    await DbSeeder.SeedAsync(context);
+
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await DbSeeder.SeedRolesAsync(roleManager);
+
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    await DbSeeder.SeedAdminUserAsync(userManager);
+}
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
+
+app.UseHttpsRedirection();
+
+app.UseCors("AllowAngularApp");
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseExceptionHandler();
+
+app.UseStaticFiles();
+
+app.MapControllers();
+
+app.MapHub<MatchHub>("hubs/matches");
+
+app.Run();

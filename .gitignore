@@ -1,0 +1,10 @@
+# .NET
+[Bb]in/
+[Oo]bj/
+*.user
+.vs/
+
+# Angular / Node
+node_modules/
+dist/
+.angular/
