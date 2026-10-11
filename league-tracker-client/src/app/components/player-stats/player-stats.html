@@ -1,0 +1,28 @@
+<h2>Statistika igrača</h2>
+
+@if (loading()) {
+  <p>Učitavanje...</p>
+} @else if (table().rows.length === 0) {
+  <p>Nema podataka.</p>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>Igrač</th>
+        @for (col of table().columns; track col.key) {
+          <th>{{ col.label }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of table().rows; track row.playerId) {
+        <tr  [class.leader-row]="row.playerId === topPlayerId()">
+          <td>{{ row.playerName }}</td>
+          @for (col of table().columns; track col.key) {
+            <td>{{ row.values[col.key] }}</td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+}

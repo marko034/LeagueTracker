@@ -1,0 +1,74 @@
+<section class="bulletin">
+  <header class="bulletin__header">
+    <p class="bulletin__eyebrow">Informacije iz lige</p>
+    <h1>Oglasna tabla</h1>
+    <p class="bulletin__intro">
+      Najave sezona, turnira i važne vesti za sve učesnike lige.
+    </p>
+  </header>
+
+  @if (featuredAnnouncement(); as featured) {
+    <article class="featured">
+      <div class="featured__content">
+        <span class="announcement-label announcement-label--season">
+          {{ featured.categoryLabel }}
+        </span>
+
+        <p class="featured__date">{{ featured.date | date: 'd. MMMM yyyy' }}</p>
+        <h2>{{ featured.title }}</h2>
+        <p>{{ featured.excerpt }}</p>
+      </div>
+    </article>
+  }
+
+  <section class="announcements" aria-labelledby="announcements-title">
+    <div class="announcements__heading">
+      <div>
+        <p class="bulletin__eyebrow">Budite u toku</p>
+        <h2 id="announcements-title">Najnovije objave</h2>
+      </div>
+
+      <div class="filters" role="group" aria-label="Filtriraj objave po kategoriji">
+        @for (category of categories; track category.id) {
+          <button
+            type="button"
+            class="filters__button"
+            [class.filters__button--active]="selectedCategory() === category.id"
+            [attr.aria-pressed]="selectedCategory() === category.id"
+            (click)="selectCategory(category.id)"
+          >
+            {{ category.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (filteredAnnouncements().length > 0) {
+      <div class="announcement-list">
+        @for (announcement of filteredAnnouncements(); track announcement.id) {
+          <article class="announcement-card">
+            <div class="announcement-card__meta">
+              <span
+                class="announcement-label"
+                [class.announcement-label--season]="announcement.category === 'season'"
+                [class.announcement-label--tournament]="announcement.category === 'tournament'"
+                [class.announcement-label--news]="announcement.category === 'news'"
+              >
+                {{ announcement.categoryLabel }}
+              </span>
+
+              <time>{{ announcement.date | date: 'd. MMM yyyy' }}</time>
+            </div>
+
+            <h3>{{ announcement.title }}</h3>
+            <p>{{ announcement.excerpt }}</p>
+          </article>
+        }
+      </div>
+    } @else {
+      <p class="announcements__empty">
+        Nema objava u izabranoj kategoriji.
+      </p>
+    }
+  </section>
+</section>

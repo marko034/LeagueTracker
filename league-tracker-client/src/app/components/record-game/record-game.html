@@ -1,0 +1,82 @@
+<h2>Unos partije</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <label for="type">Tip partije:
+        <select formControlName="type">
+            <option value="Single">Singl</option>
+            <option value="Double">Dubl</option>
+        </select>
+    </label>
+
+    <fieldset>
+        <legend>Domaći tim</legend>
+        <select formControlName="homePlayer1Id">
+            <option [value]="null">-- Izaberi igrača --</option>
+            @for(player of homePlayers(); track player.id){
+                <option [value]="player.id">{{ player.firstName }} {{ player.lastName }}</option>
+            }
+        </select>
+    
+        @if(isDoubles){
+            <select formControlName="homePlayer2Id">
+                <option [value]="null">-- Izaberi partnera --</option>
+                @for(player of homePlayers(); track player.id){
+                    <option [value]="player.id">{{ player.firstName }} {{ player.lastName }}</option>
+                }
+            </select>
+        }
+    </fieldset>
+
+    <fieldset>
+        <legend>Gostujući tim</legend>
+        <select formControlName="awayPlayer1Id">
+            <option [value]="null">-- Izaberi igrača --</option>
+            @for(player of awayPlayers(); track player.id){
+                <option [value]="player.id">{{ player.firstName }} {{ player.lastName }}</option>
+            }
+        </select>
+    
+        @if(isDoubles){
+            <select formControlName="awayPlayer2Id">
+                <option [value]="null">-- Izaberi partnera --</option>
+                @for(player of awayPlayers(); track player.id){
+                    <option [value]="player.id">{{ player.firstName }} {{ player.lastName }}</option>
+                }
+            </select>
+        }
+    </fieldset>
+
+    <fieldset formArrayName="sets">
+        <legend>Setovi</legend>
+        @for(setGroup of sets.controls; track $index; let i = $index){
+            <div [formGroupName]="i">
+                <span>Set {{ i + 1 }}</span>
+                <input type="number" formControlName="homeScore" min="0"/>
+                :
+                <input type="number" formControlName="awayScore" min="0"/>
+                <button type="button" (click)="removeSet(i)">Ukloni</button>
+            </div>
+        }
+        <button type="button" (click)="addSet()">Dodaj set</button>
+    </fieldset>
+
+    @if(submitError()){
+        <p style="color: red;">{{submitError()}}</p>
+    }
+
+    <button type="submit" [disabled]="submitting()">Sačuvaj partiju</button>
+</form>
+ 
+<hr/>
+
+<div class="match-actions">
+    <button type="button" class="match-actions__button match-actions__button--finalize" (click)="onFinalize()">
+        Finalizuj meč
+    </button>
+    @if(authService.isAdmin()){
+        <button type="button" class="match-actions__button match-actions__button--verify" (click)="onVerify()">
+            Verifikuj meč (admin)
+        </button>
+    }
+</div>

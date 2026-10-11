@@ -1,0 +1,46 @@
+.match-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.match-actions__button {
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.65rem 1.1rem;
+  color: #fff;
+  font: 700 1rem var(--font-body);
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+}
+
+.match-actions__button--finalize {
+  border-color: #39835b;
+  background: #286344;
+
+  &:hover {
+    border-color: #57a879;
+    background: #337c54;
+  }
+}
+
+.match-actions__button--verify {
+  border-color: #5577b2;
+  background: #354f80;
+
+  &:hover {
+    border-color: #7898cf;
+    background: #42639c;
+  }
+}

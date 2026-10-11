@@ -1,0 +1,22 @@
+<h2>Timovi</h2>
+
+@if (loading()) {
+  <p>Učitavanje...</p>
+} @else if (teams().length === 0) {
+  <p>Nema timova.</p>
+} @else {
+  <div class="card-grid">
+    @for (team of teams(); track team.id) {
+      <a [routerLink]="['/teams', team.id]" class="team-card">
+        <span class="avatar avatar--lg">
+          @if (team.logoUrl) {
+            <img [src]="team.logoUrl" [alt]="team.name" />
+          } @else {
+            {{ team.name.charAt(0) }}
+          }
+        </span>
+        <h3>{{ team.name }}</h3>
+      </a>
+    }
+  </div>
+}

@@ -1,0 +1,68 @@
+<h2>Mečevi</h2>
+@if(loading()){
+<p>Učitavanje...</p>
+} @else if(matches().length === 0){
+<p>Nema mečeva za prikaz.</p>
+} @else {
+<table>
+    <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Domaćin</th>
+            <th>Gost</th>
+            <th>Rezultat</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for(match of matches(); track match.id){
+        <tr>
+            <td>{{ match.scheduledAt | date: 'dd.MM.yyyy' }}</td>
+            <td>
+                <span class="row-with-avatar">
+                    <span class="avatar avatar--sm">
+                        @if (match.homeTeamLogoUrl) {
+                        <img [src]="match.homeTeamLogoUrl" [alt]="match.homeTeamName" />
+                        } @else {
+                        {{ match.homeTeamName.charAt(0) }}
+                        }
+                    </span>
+                    {{ match.homeTeamName }}
+                </span>
+            </td>
+            <td>
+                <span class="row-with-avatar">
+                    <span class="avatar avatar--sm">
+                        @if (match.awayTeamLogoUrl) {
+                        <img [src]="match.awayTeamLogoUrl" [alt]="match.awayTeamName" />
+                        } @else {
+                        {{ match.awayTeamName.charAt(0) }}
+                        }
+                    </span>
+                    {{ match.awayTeamName }}
+                </span>
+            </td>
+            <td>
+                @if(match.homeScore !== null && match.awayScore !== null){
+                {{ match.homeScore }} : {{ match.awayScore }}
+                } @else {
+                -
+                }
+            </td>
+            <td>
+                <span class="status" [class.status--verified]="match.status === 'Verified'"
+                    [class.status--scheduled]="match.status === 'Scheduled'">
+                    {{ match.status }}
+                </span>
+            </td>
+            <td>
+                @if((match.status === 'Scheduled' || match.status === 'InProgress') && authService.isLoggedIn()){
+                <a [routerLink]="['/matches', match.id, 'record-game']">Unesi rezultat</a>
+                }
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+}

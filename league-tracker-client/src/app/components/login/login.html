@@ -1,0 +1,20 @@
+<h2>Prijava</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+<fieldset>
+    <label>
+        Email
+        <input type="text" formControlName="email" />
+    </label>
+
+    <label>
+        Lozinka
+        <input type="password" formControlName="password" />
+    </label>
+</fieldset>
+    @if(errorMessage()){
+        <p style="color: var(--rubber-red, red)">{{ errorMessage() }}</p>
+    }
+
+  <button type="submit">Prijavi se</button>
+</form>

@@ -1,0 +1,63 @@
+@if (team(); as t) {
+  <div class="team-header">
+    <span class="avatar avatar--lg">
+      @if (t.logoUrl) {
+        <img [src]="t.logoUrl" [alt]="t.name" />
+      } @else {
+        {{ t.name.charAt(0) }}
+      }
+    </span>
+    <div>
+      <h2 style="border: none; margin: 0;">{{ t.name }}</h2>
+      <p style="color: var(--mist); margin: 0.25rem 0 0;">{{ players().length }} igrača</p>
+    </div>
+  </div>
+}
+
+<h3 style="margin-top: 2rem;">Igrači</h3>
+
+@if (loading()) {
+  <p>Učitavanje...</p>
+} @else if (players().length === 0) {
+  <p>Nema igrača.</p>
+} @else {
+  <div class="card-grid">
+    @for (player of players(); track player.id) {
+      <a [routerLink]="['/players', player.id]" class="player-card">
+        <span class="avatar avatar--md">
+          @if (player.photoUrl) {
+            <img [src]="player.photoUrl" [alt]="player.firstName" />
+          } @else {
+            {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
+          }
+        </span>
+        <span>{{ player.firstName }} {{ player.lastName }}</span>
+      </a>
+    }
+  </div>
+}
+<h3 style="margin-top: 2rem;">Istorija po sezonama</h3>
+@if (history().length === 0) {
+  <p>Tim još nije igrao nijednu sezonu.</p>
+} @else {
+  <table>
+    <thead>
+      <tr><th>Sezona</th><th>Liga</th><th>Plasman</th><th>Odigrano</th><th>Pobede</th><th>Porazi</th><th>Bodovi</th></tr>
+    </thead>
+    <tbody>
+      @for (h of history(); track h.seasonId) {
+        <tr>
+          <td>{{ h.seasonName }}</td>
+          <td>{{ h.leagueName }}</td>
+          <td class="score">{{ h.position ?? '—' }}</td>
+          <td>{{ h.played }}</td>
+          <td>{{ h.wins }}</td>
+          <td>{{ h.losses }}</td>
+          <td class="score"><strong>{{ h.points }}</strong></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
+
+<a routerLink="/teams" style="display: inline-block; margin-top: 1.5rem;">← Nazad na timove</a>

@@ -1,0 +1,35 @@
+<nav class="app-nav">
+  <span class="app-nav__brand">LEAGUE TRACKER</span>
+
+  <div class="app-nav__controls">
+    @if (seasonService.seasons().length > 0) {
+    <select class="season-select" [value]="seasonService.selectedId()" (change)="onSeasonChange($event)">
+      @for (season of seasonService.seasons(); track season.id) {
+      <option [value]="season.id">{{ season.leagueName }} — {{ season.name }}</option>
+      }
+    </select>
+    }
+    <button class="app-nav__toggle" (click)="toggleMenu()" aria-label="Meni">☰</button>
+  </div>
+  <div class="app-nav__links" [class.open]="menuOpen()">
+    <!--a routerLink="/announcements" routerLinkActive="active" (click)="closeMenu()">
+      Oglasna tabla
+    </a-->
+    <a routerLink="/news" routerLinkActive="active" (click)="closeMenu()">Novosti</a>
+    <a routerLink="/teams" routerLinkActive="active" (click)="closeMenu()">Timovi</a>
+    <a routerLink="/standings" routerLinkActive="active" (click)="closeMenu()">Tabela</a>
+    <a routerLink="/player-stats" routerLinkActive="active" (click)="closeMenu()">Statistika igrača</a>
+    <a routerLink="/matches" routerLinkActive="active" (click)="closeMenu()">Mečevi</a>
+    @if (authService.isLoggedIn()) {
+    <a type="button" (click)="onLogout()">Odjava ({{ authService.displayName() }})</a>
+    } @else {
+    <a routerLink="/login" routerLinkActive="active" (click)="closeMenu()">Prijava</a>
+    }
+    @if (authService.isAdmin()) {
+    <a routerLink="/admin" routerLinkActive="active" (click)="closeMenu()">Admin</a>
+    }
+  </div>
+</nav>
+<main class="page">
+  <router-outlet />
+</main>

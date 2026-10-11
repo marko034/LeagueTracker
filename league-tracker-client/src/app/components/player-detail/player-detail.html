@@ -1,0 +1,78 @@
+<div class="admin-tabs">
+  <button type="button" [class.active]="scope() === 'season'" (click)="scope.set('season')">Ova sezona</button>
+  <button type="button" [class.active]="scope() === 'career'" (click)="scope.set('career')">Karijera</button>
+</div>
+
+@if (player(); as p) {
+<div class="row-with-avatar" style="margin-bottom: 1rem;">
+  <span class="avatar avatar--lg">
+    @if (p.photoUrl) {
+    <img [src]="p.photoUrl" [alt]="p.firstName" />
+    } @else {
+    {{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}
+    }
+  </span>
+  <h2 style="border: none; margin: 0;">{{ p.firstName }} {{ p.lastName }}</h2>
+</div>
+
+@if (p.dateOfBirth) {
+<p>Datum rođenja: {{ p.dateOfBirth | date:'dd.MM.yyyy' }}</p>
+}
+@if (stats(); as s) {
+<div class="stats-grid">
+  <div class="stat-donut-wrap">
+    <app-stat-donut-chart [value]="s.wins" [total]="s.wins + s.losses" color="#1e9e63" />
+    <p><strong>{{ winRate() }}%</strong></p>
+    <p>Pobede: {{ s.wins }} / Porazi: {{ s.losses }}</p>
+  </div>
+
+  <div class="stat-donut-wrap">
+    <app-stat-donut-chart [value]="s.setsWon" [total]="s.setsWon + s.setsLost" color="#b9a3ff" />
+    <p><strong>{{ setRate() }}%</strong></p>
+    <p>Setovi: {{ s.setsWon }} / {{ s.setsLost }}</p>
+  </div>
+</div>
+<h3 style="margin-top: 2rem;">Forma (poslednjih {{ s.recentForm.length }})</h3>
+<div class="form-dots">
+  @for (game of s.recentForm; track $index) {
+  <span class="form-dot" [class.form-dot--win]="game.won" [class.form-dot--loss]="!game.won"
+    [title]="(game.won ? 'Pobeda' : 'Poraz') + ' protiv ' + game.opponentTeamName + ' (' + game.setsWon + ':' + game.setsLost + ')'">
+    {{ game.won ? 'P' : 'I' }}
+  </span>
+  }
+</div>
+
+@if (s.seasonBreakdown.length > 0) {
+<h3 style="margin-top: 2rem;">Po sezonama</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Sezona</th>
+      <th>Liga</th>
+      <th>Pobede</th>
+      <th>Porazi</th>
+      <th>Setovi</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (row of s.seasonBreakdown; track row.seasonId) {
+    <tr>
+      <td>{{ row.seasonName }}</td>
+      <td>{{ row.leagueName }}</td>
+      <td>{{ row.wins }}</td>
+      <td>{{ row.losses }}</td>
+      <td class="score">{{ row.setsWon }} : {{ row.setsLost }}</td>
+    </tr>
+    }
+  </tbody>
+</table>
+}
+
+}
+
+
+
+@if (p.teamId) {
+<a [routerLink]="['/teams', p.teamId]">← Nazad na tim ({{ p.teamName }})</a>
+}
+}
