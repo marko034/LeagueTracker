@@ -417,7 +417,13 @@ namespace LeagueTracker.Infrastructure.Migrations
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("SessionStartedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TokenHash")
@@ -430,6 +436,8 @@ namespace LeagueTracker.Infrastructure.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FamilyId");
 
                     b.HasIndex("TokenHash")
                         .IsUnique();
