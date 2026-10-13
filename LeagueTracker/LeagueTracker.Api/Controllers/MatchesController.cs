@@ -55,4 +55,9 @@ public class MatchesController : ControllerBase
         var deleted = await _matchService.DeleteAsync(id);
         return deleted ? NoContent() : NotFound();
     }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("{id}/reset")]
+    public async Task<IActionResult> ResetResult(int id)
+        => await _matchService.ResetResultAsync(id) ? NoContent() : NotFound();
 }

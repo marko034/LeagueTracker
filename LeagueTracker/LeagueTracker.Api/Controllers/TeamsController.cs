@@ -58,8 +58,8 @@ namespace LeagueTracker.Api.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}/seasons/{seasonId}")]
-        public async Task<IActionResult> UnregisterFromSeason(int id, int seasonId)
-            => await _teamService.UnregisterFromSeasonAsync(id, seasonId) ? NoContent() : NotFound();
+        public async Task<IActionResult> UnregisterFromSeason(int id, int seasonId, [FromQuery] bool removePlayers = false)
+            => await _teamService.UnregisterFromSeasonAsync(id, seasonId, removePlayers) ? NoContent() : NotFound();
 
         [HttpGet("{id}/history")]
          public async Task<ActionResult<List<TeamSeasonHistoryDto>>> GetHistory(int id)

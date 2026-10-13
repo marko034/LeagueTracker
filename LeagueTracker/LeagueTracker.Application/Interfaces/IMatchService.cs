@@ -11,4 +11,5 @@ public interface IMatchService
     Task<MatchDto> CreateAsync(CreateMatchDto matchDto);
     Task<List<MatchDto>> GetAwaitingVerificationAsync();
     Task<bool> DeleteAsync(int id);
+    Task<bool> ResetResultAsync(int id);
 }

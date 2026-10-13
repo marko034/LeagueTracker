@@ -12,10 +12,12 @@ namespace LeagueTracker.Infrastructure.Services;
 public class MatchService : IMatchService
 {
     public LeagueTrackerDbContext _context;
+    private readonly IMatchNotifier _matchNotifier;
 
-    public MatchService(LeagueTrackerDbContext context)
+    public MatchService(LeagueTrackerDbContext context, IMatchNotifier matchNotifier)
     {
         _context = context;
+        _matchNotifier = matchNotifier;
     }
     public async Task<MatchDto> CreateAsync(CreateMatchDto matchDto)
     {
@@ -53,8 +55,12 @@ public class MatchService : IMatchService
         var match = await _context.Matches.FindAsync(id);
         if (match is null) return false;
 
+        var seasonId = match.SeasonId;
+
         _context.Matches.Remove(match);
         await _context.SaveChangesAsync();
+
+        await _matchNotifier.NotifyMatchUpdatedAsync(id, seasonId);
         return true;
     }
 
@@ -126,5 +132,23 @@ public class MatchService : IMatchService
                 SeasonId = m.SeasonId
             })
             .ToListAsync();
+    }
+
+    public async Task<bool> ResetResultAsync(int id)
+    {
+        var match = await _context.Matches
+            .Include(m => m.Games)
+            .FirstOrDefaultAsync(m => m.Id == id);
+
+        if(match is null) return false;
+
+        _context.Games.RemoveRange(match.Games);
+        match.HomeScore = null;
+        match.AwayScore = null;
+        match.Status = MatchStatus.Scheduled;
+
+        await _context.SaveChangesAsync();
+        await _matchNotifier.NotifyMatchUpdatedAsync(id, match.SeasonId);
+        return true;
     }
 }

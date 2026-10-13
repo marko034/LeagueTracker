@@ -12,6 +12,6 @@ public interface ITeamService
     Task<bool> DeleteAsync(int id);
     Task<TeamDto?> UpdateAsync(int id, CreateTeamDto dto);
     Task<bool> RegisterToSeasonAsync(int teamId, int seasonId);
-    Task<bool> UnregisterFromSeasonAsync(int teamId, int seasonId);
+    Task<bool> UnregisterFromSeasonAsync(int teamId, int seasonId, bool removePlayers = false);
     Task<List<TeamSeasonHistoryDto>> GetHistoryAsync(int teamId);
 }

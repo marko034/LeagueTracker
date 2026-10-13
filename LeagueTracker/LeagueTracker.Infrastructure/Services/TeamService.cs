@@ -136,22 +136,29 @@ public class TeamService : ITeamService
         return true;
     }
 
-    public async Task<bool> UnregisterFromSeasonAsync(int teamId, int seasonId)
+    public async Task<bool> UnregisterFromSeasonAsync(int teamId, int seasonId, bool removePlayers)
     {
         var teamSeason = await _context.TeamSeasons
             .FirstOrDefaultAsync(ts => ts.TeamId == teamId && ts.SeasonId == seasonId);
         if (teamSeason is null) return false;
 
-        if (await _context.PlayerRegistrations.AnyAsync(r => r.TeamSeasonId == teamSeason.Id))
-        {
-            throw new BusinessRuleException("Tim ima prijavljene igrače u ovoj sezoni. Prvo ih odjavite.");
-        }
-
         if (await _context.Matches.AnyAsync(m => m.SeasonId == seasonId &&
                                                  (m.HomeTeamId == teamId || m.AwayTeamId == teamId)))
         {
-            throw new BusinessRuleException("Tim ima mečeve u ovoj sezoni i ne može biti odjavljen.");
+            throw new BusinessRuleException("Tim ima mečeve u ovoj sezoni. Prvo ih obrišite u Admin → U sezoni → Mečevi.");
         }
+
+        var registrations = await _context.PlayerRegistrations
+        .Where(r => r.TeamSeasonId == teamSeason.Id)
+        .ToListAsync();
+
+        if (registrations.Count > 0 && !removePlayers)
+        {
+            throw new BusinessRuleException(
+                $"Tim ima {registrations.Count} prijavljenih igrača u ovoj sezoni. Prvo ih odjavite ili odjavite tim zajedno sa igračima.");
+        }
+
+        _context.PlayerRegistrations.RemoveRange(registrations);
 
         _context.TeamSeasons.Remove(teamSeason);
         await _context.SaveChangesAsync();
