@@ -1,0 +1,22 @@
+@if (season(); as current) {
+  <div class="season-bar">
+    <label>
+      Sezona
+      <select (change)="onSeasonChange($event)">
+        @for (s of seasonService.seasons(); track s.id) {
+          <option [value]="s.id" [selected]="s.id === current.id">{{ s.leagueName }} — {{ s.name }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  <nav class="admin-tabs admin-tabs--sub">
+    <a routerLink="timovi" routerLinkActive="active">Timovi</a>
+    <a routerLink="sastavi" routerLinkActive="active">Sastavi</a>
+    <a routerLink="mecevi" routerLinkActive="active">Mečevi</a>
+  </nav>
+
+  <router-outlet />
+} @else if (seasonService.seasons().length > 0) {
+  <p>Sezona ne postoji. <a routerLink="/admin/sezona">Izaberite drugu.</a></p>
+}

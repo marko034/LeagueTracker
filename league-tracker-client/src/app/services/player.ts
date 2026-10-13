@@ -57,4 +57,8 @@ export class PlayerService {
   unregister(playerId: number, seasonId: number) {
     return this.http.delete(`${this.apiUrl}/${playerId}/register?seasonId=${seasonId}`);
   }
+
+  getBySeasonRaw(seasonId: number) {
+    return this.http.get<Player[]>(`${this.apiUrl}?seasonId=${seasonId}`);
+  }
 }

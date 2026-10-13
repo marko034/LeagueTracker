@@ -1,0 +1,34 @@
+<form [formGroup]="leagueForm" (ngSubmit)="onCreateLeague()">
+    <fieldset>
+        <legend>Nova liga</legend>
+        <label>Naziv <input type="text" formControlName="name" /></label>
+        <label>
+            Sport
+            <select formControlName="sportId">
+                <option [ngValue]="null">-- Izaberi sport --</option>
+                @for (sport of sports(); track sport.id) {
+                <option [ngValue]="sport.id">{{ sport.name }}</option>
+                }
+            </select>
+        </label>
+    </fieldset>
+    <button type="submit">Kreiraj ligu</button>
+</form>
+
+<form [formGroup]="seasonForm" (ngSubmit)="onCreateSeason()">
+    <fieldset>
+        <legend>Nova sezona</legend>
+        <label>Naziv (npr. 2026/27) <input type="text" formControlName="name" /></label>
+        <label>Početak <app-date-time-picker [withTime]="false" placeholder="Izaberi datum" formControlName="startDate" /></label>
+        <label>
+            Liga
+            <select formControlName="leagueId">
+                <option [ngValue]="null">-- Izaberi ligu --</option>
+                @for (league of leagues(); track league.id) {
+                <option [ngValue]="league.id">{{ league.name }} ({{ league.sportName }})</option>
+                }
+            </select>
+        </label>
+    </fieldset>
+    <button type="submit">Kreiraj sezonu</button>
+</form>

@@ -1,0 +1,18 @@
+<h2>Admin panel</h2>
+
+<nav class="admin-tabs">
+  <a routerLink="pregled" routerLinkActive="active">Pregled</a>
+  <a routerLink="timovi" routerLinkActive="active">Timovi</a>
+  <a routerLink="igraci" routerLinkActive="active">Igrači</a>
+  <a routerLink="sezona" routerLinkActive="active">U sezoni</a>
+  <a routerLink="lige" routerLinkActive="active">Lige i sezone</a>
+  <a routerLink="najave" routerLinkActive="active">Najave</a>
+</nav>
+
+@if (feedback.message(); as msg) {
+  <p class="admin-banner"
+     [class.admin-banner--success]="msg.type === 'success'"
+     [class.admin-banner--error]="msg.type === 'error'">{{ msg.text }}</p>
+}
+
+<router-outlet />

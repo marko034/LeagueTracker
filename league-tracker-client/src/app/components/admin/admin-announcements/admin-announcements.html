@@ -1,0 +1,24 @@
+<form [formGroup]="announcementForm" (ngSubmit)="onCreateAnnouncement()">
+    <fieldset>
+        <legend>Nova najava</legend>
+        <label>Naslov <input type="text" formControlName="title" /></label>
+        <label>
+            Sadržaj
+            <textarea formControlName="content" rows="4"
+                style="width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--ink); border-radius: 4px; padding: 0.5rem;"></textarea>
+        </label>
+    </fieldset>
+    <button type="submit">Objavi</button>
+</form>
+
+<h3 style="margin-top: 2rem;">Postojeće najave</h3>
+@for (item of announcements(); track item.id) {
+<div class="announcement-card" style="margin-bottom: 0.75rem;">
+    <div class="announcement-card__meta">
+        <span>{{ item.publishedAt | date:'dd.MM.yyyy' }}</span>
+        <button type="button" (click)="onDeleteAnnouncement(item.id)">Obriši</button>
+    </div>
+    <h3>{{ item.title }}</h3>
+    <p>{{ item.content }}</p>
+</div>
+}

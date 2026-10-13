@@ -1,0 +1,56 @@
+<h3>Sastav tima</h3>
+
+<label>
+  Tim
+  <select [formControl]="teamControl">
+    <option [ngValue]="null">-- Izaberi tim --</option>
+    @for (team of seasonTeams(); track team.id) {
+      <option [ngValue]="team.id">{{ team.name }}</option>
+    }
+  </select>
+</label>
+
+@if (teamId()) {
+  <form [formGroup]="addForm" (ngSubmit)="register()" style="margin-top: 1rem;">
+    <fieldset>
+      <legend>Dodaj igrača u sastav</legend>
+      <label>
+        Igrač (koji još nije ni u jednom timu u ovoj sezoni)
+        <select formControlName="playerId">
+          <option [ngValue]="null">-- Izaberi igrača --</option>
+          @for (player of availablePlayers(); track player.id) {
+            <option [ngValue]="player.id">{{ player.firstName }} {{ player.lastName }}</option>
+          }
+        </select>
+      </label>
+    </fieldset>
+    <button type="submit">Dodaj u sastav</button>
+  </form>
+
+  <h3 style="margin-top: 2rem;">Sastav ({{ roster().length }})</h3>
+
+  @if (roster().length === 0) {
+    <p>Tim nema igrača u ovoj sezoni.</p>
+  } @else {
+    <table>
+      <thead><tr><th>Igrač</th><th></th></tr></thead>
+      <tbody>
+        @for (player of roster(); track player.id) {
+          <tr>
+            <td class="row-with-avatar">
+              <span class="avatar avatar--sm">
+                @if (player.photoUrl) {
+                  <img [src]="player.photoUrl" alt="" />
+                } @else {
+                  {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
+                }
+              </span>
+              {{ player.firstName }} {{ player.lastName }}
+            </td>
+            <td><button type="button" (click)="unregister(player)">Odjavi iz sastava</button></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+}

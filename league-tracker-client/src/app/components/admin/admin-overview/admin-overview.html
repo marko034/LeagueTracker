@@ -1,0 +1,34 @@
+<h3>Mečevi koji čekaju verifikaciju</h3>
+
+@if (loading()) {
+<p>Učitavanje...</p>
+} @else if (pendingMatches().length === 0) {
+<p>Nema mečeva koji čekaju verifikaciju.</p>
+} @else {
+<table>
+    <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Domaćin</th>
+            <th>Gost</th>
+            <th>Rezultat</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (match of pendingMatches(); track match.id) {
+        <tr>
+            <td>{{ match.scheduledAt | date:'dd.MM.yyyy HH:mm' }}</td>
+            <td>{{ match.homeTeamName }}</td>
+            <td>{{ match.awayTeamName }}</td>
+            <td class="score">{{ match.homeScore }} : {{ match.awayScore }}</td>
+            <td>
+                <a [routerLink]="['/matches', match.id, 'record-game']">Pregledaj partije</a>
+                <button type="button" class="admin-action admin-action--verify"
+                    (click)="onVerify(match.id)">Verifikuj</button>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+}

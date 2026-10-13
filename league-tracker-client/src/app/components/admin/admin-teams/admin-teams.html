@@ -1,0 +1,51 @@
+<form [formGroup]="teamForm" (ngSubmit)="onSubmitTeam()">
+    <fieldset>
+        <legend>{{ editingTeamId() ? 'Izmeni tim' : 'Novi tim' }}</legend>
+        <label>Naziv <input type="text" formControlName="name" /></label>
+        <label>
+            Logo tima
+            <input type="file" accept="image/*" (change)="onTeamLogoSelected($event)" />
+        </label>
+        @if (teamLogoUploading()) {
+        <p>Upload u toku...</p>
+        }
+        @if (teamForm.value.logoUrl) {
+        <img [src]="teamForm.value.logoUrl" width="60" alt="" />
+        }
+    </fieldset>
+
+    <button type="submit">{{ editingTeamId() ? 'Sačuvaj izmene' : 'Kreiraj tim' }}</button>
+    @if (editingTeamId()) {
+    <button type="button" (click)="cancelEditTeam()">Otkaži</button>
+    }
+</form>
+
+<h3 style="margin-top: 2rem;">Postojeći timovi</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Naziv</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (team of allTeams(); track team.id) {
+        <tr>
+            <td class="row-with-avatar">
+                <span class="avatar avatar--sm">
+                    @if (team.logoUrl) {
+                    <img [src]="team.logoUrl" alt="" />
+                    } @else {
+                    {{ team.name.charAt(0) }}
+                    }
+                </span>
+                {{ team.name }}
+            </td>
+            <td>
+                <button type="button" (click)="startEditTeam(team)">Izmeni</button>
+                <button type="button" (click)="deleteTeam(team.id)">Obriši</button>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

@@ -50,8 +50,8 @@ export class TeamService {
     return this.http.post(`${this.apiUrl}/${teamId}/seasons/${seasonId}`, {});
   }
 
-  unregisterFromSeason(teamId: number, seasonId: number) {
-    return this.http.delete(`${this.apiUrl}/${teamId}/seasons/${seasonId}`);
+  unregisterFromSeason(teamId: number, seasonId: number, removePlayers = false) {
+    return this.http.delete(`${this.apiUrl}/${teamId}/seasons/${seasonId}?removePlayers=${removePlayers}`);
   }
 
   getHistory(teamId: number) {

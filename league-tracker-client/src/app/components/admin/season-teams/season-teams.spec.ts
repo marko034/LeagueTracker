@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AdminDashboard } from './admin-dashboard';
+import { SeasonTeams } from './season-teams';
 
-describe('AdminDashboard', () => {
-  let component: AdminDashboard;
-  let fixture: ComponentFixture<AdminDashboard>;
+describe('SeasonTeams', () => {
+  let component: SeasonTeams;
+  let fixture: ComponentFixture<SeasonTeams>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdminDashboard],
+      imports: [SeasonTeams],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdminDashboard);
+    fixture = TestBed.createComponent(SeasonTeams);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

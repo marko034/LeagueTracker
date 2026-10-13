@@ -1,0 +1,70 @@
+<h3>Novi meč</h3>
+
+<form [formGroup]="form" (ngSubmit)="create()">
+  <fieldset>
+    <label>
+      Domaćin
+      <select formControlName="homeTeamId">
+        <option [ngValue]="null">-- Izaberi tim --</option>
+        @for (team of seasonTeams(); track team.id) {
+          <option [ngValue]="team.id">{{ team.name }}</option>
+        }
+      </select>
+    </label>
+    <label>
+      Gost
+      <select formControlName="awayTeamId">
+        <option [ngValue]="null">-- Izaberi tim --</option>
+        @for (team of seasonTeams(); track team.id) {
+          <option [ngValue]="team.id">{{ team.name }}</option>
+        }
+      </select>
+    </label>
+    <label>Datum i vreme <app-date-time-picker formControlName="scheduledAt" /></label>
+  </fieldset>
+  <button type="submit">Kreiraj meč</button>
+</form>
+
+<h3 style="margin-top: 2rem;">Mečevi u sezoni ({{ matches().length }})</h3>
+
+@if (matches().length === 0) {
+  <p>Nema mečeva.</p>
+} @else {
+  <table>
+    <thead>
+      <tr><th>Datum</th><th>Domaćin</th><th>Gost</th><th>Rezultat</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+      @for (match of matches(); track match.id) {
+        <tr>
+          <td>{{ match.scheduledAt | date:'dd.MM.yyyy HH:mm' }}</td>
+          <td>{{ match.homeTeamName }}</td>
+          <td>{{ match.awayTeamName }}</td>
+          <td class="score">
+            @if (match.homeScore !== null && match.awayScore !== null) {
+              {{ match.homeScore }} : {{ match.awayScore }}
+            } @else {
+              —
+            }
+          </td>
+          <td>
+            <span class="status"
+                  [class.status--verified]="match.status === 'Verified'"
+                  [class.status--scheduled]="match.status === 'Scheduled'">
+              {{ statusLabels[match.status] ?? match.status }}
+            </span>
+          </td>
+          <td>
+            <a [routerLink]="['/matches', match.id, 'record-game']">
+              {{ match.status === 'Scheduled' ? 'Unesi rezultat' : 'Partije' }}
+            </a>
+            @if (match.status !== 'Scheduled') {
+              <button type="button" (click)="reset(match)">Poništi rezultat</button>
+            }
+            <button type="button" (click)="remove(match)">Obriši</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

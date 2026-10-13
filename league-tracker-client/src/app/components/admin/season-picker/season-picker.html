@@ -1,0 +1,14 @@
+<h3>Izaberite sezonu</h3>
+
+@if (seasonService.seasons().length === 0) {
+  <p>Nema sezona. Napravite je u odeljku „Lige i sezone“.</p>
+} @else {
+  <div class="card-grid">
+    @for (season of seasonService.seasons(); track season.id) {
+      <a [routerLink]="[season.id, 'timovi']" class="team-card">
+        <h3>{{ season.name }}</h3>
+        <span style="color: var(--mist);">{{ season.leagueName }}</span>
+      </a>
+    }
+  </div>
+}

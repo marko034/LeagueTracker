@@ -39,4 +39,12 @@ export class MatchService {
   delete(id: number) {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
+
+  getBySeasonRaw(seasonId: number) {
+    return this.http.get<Match[]>(`${this.apiUrl}?seasonId=${seasonId}`);
+  }
+
+  reset(id: number) {
+    return this.http.post(`${this.apiUrl}/${id}/reset`, {});
+  }
 }

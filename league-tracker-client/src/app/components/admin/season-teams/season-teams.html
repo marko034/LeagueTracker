@@ -1,0 +1,42 @@
+<h3>Prijava tima na sezonu</h3>
+
+<form [formGroup]="form" (ngSubmit)="register()">
+  <fieldset>
+    <label>
+      Tim (koji još nije u ovoj sezoni)
+      <select formControlName="teamId">
+        <option [ngValue]="null">-- Izaberi tim --</option>
+        @for (team of availableTeams(); track team.id) {
+          <option [ngValue]="team.id">{{ team.name }}</option>
+        }
+      </select>
+    </label>
+  </fieldset>
+  <button type="submit">Prijavi</button>
+</form>
+
+<h3 style="margin-top: 2rem;">Timovi u sezoni ({{ seasonTeams().length }})</h3>
+
+@if (seasonTeams().length === 0) {
+  <p>Nijedan tim još nije prijavljen.</p>
+} @else {
+  <table>
+    <thead><tr><th>Tim</th><th></th></tr></thead>
+    <tbody>
+      @for (team of seasonTeams(); track team.id) {
+        <tr>
+          <td class="row-with-avatar">
+            <span class="avatar avatar--sm">
+              @if (team.logoUrl) { <img [src]="team.logoUrl" alt="" /> } @else { {{ team.name.charAt(0) }} }
+            </span>
+            {{ team.name }}
+          </td>
+          <td><button type="button" (click)="unregister(team)">Odjavi iz sezone</button></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <p style="color: var(--mist); font-size: 0.85rem;">
+    Tim koji ima mečeve u ovoj sezoni ne može se odjaviti dok se mečevi ne obrišu (kartica „Mečevi“).
+  </p>
+}
