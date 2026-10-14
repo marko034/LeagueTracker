@@ -142,7 +142,7 @@ public class PlayerService : IPlayerService
             throw new BusinessRuleException("Igrač je već prijavljen u ovoj sezoni.");
         }
 
-        _context.PlayerRegistrations.Add(new PlayerRegistration { PlayerId = playerId, TeamSeasonId = teamSeason.SeasonId });
+        _context.PlayerRegistrations.Add(new PlayerRegistration { PlayerId = playerId, TeamSeasonId = teamSeason.Id });
         await _context.SaveChangesAsync(); 
         return true;
     }
