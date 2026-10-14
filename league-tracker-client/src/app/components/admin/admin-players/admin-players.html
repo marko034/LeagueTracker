@@ -1,24 +1,19 @@
 <form [formGroup]="playerForm" (ngSubmit)="onSubmitPlayer()">
-    <fieldset>
-        <legend>{{ editingPlayerId() ? 'Izmeni igrača' : 'Novi igrač' }}</legend>
-        <label>Ime <input type="text" formControlName="firstName" /></label>
-        <label>Prezime <input type="text" formControlName="lastName" /></label>
-        <label>
-            Slika igrača
-            <input type="file" accept="image/*" (change)="onPlayerPhotoSelected($event)" />
-        </label>
-        @if (photoUploading()) {
-        <p>Upload u toku...</p>
-        }
-        @if (playerForm.value.photoUrl) {
-        <img [src]="playerForm.value.photoUrl" width="60" alt="" />
-        }
-    </fieldset>
+  <fieldset>
+    <legend>{{ editingPlayerId() ? 'Izmeni igrača' : 'Novi igrač' }}</legend>
+    <label>Ime <input type="text" formControlName="firstName" /></label>
+    <label>Prezime <input type="text" formControlName="lastName" /></label>
+    <label>Datum rođenja <app-date-time-picker [withTime]="false" placeholder="Izaberi datum"
+        formControlName="dateOfBirth" /></label>
+    <label>Slika igrača</label>
+    <app-image-upload formControlName="photoUrl" shape="circle"
+      [fallbackText]="(playerForm.value.firstName?.charAt(0) ?? '') + (playerForm.value.lastName?.charAt(0) ?? '')" />
+  </fieldset>
 
-    <button type="submit">{{ editingPlayerId() ? 'Sačuvaj izmene' : 'Kreiraj igrača' }}</button>
-    @if (editingPlayerId()) {
-    <button type="button" (click)="cancelEditPlayer()">Otkaži</button>
-    }
+  <button type="submit">{{ editingPlayerId() ? 'Sačuvaj izmene' : 'Kreiraj igrača' }}</button>
+  @if (editingPlayerId()) {
+  <button type="button" (click)="cancelEditPlayer()">Otkaži</button>
+  }
 </form>
 
 <h3 style="margin-top: 2rem;">Pronađi igrača</h3>
@@ -29,49 +24,45 @@
   <select [value]="seasonFilterId() ?? ''" (change)="onSeasonFilter($event)">
     <option value="">Sve sezone</option>
     @for (season of seasons(); track season.id) {
-      <option [value]="season.id">{{ season.leagueName }} — {{ season.name }}</option>
+    <option [value]="season.id">{{ season.leagueName }} — {{ season.name }}</option>
     }
   </select>
 
   <select [value]="teamFilterId() ?? ''" [disabled]="!seasonFilterId()" (change)="onTeamFilter($event)">
     <option value="">Svi timovi</option>
     @for (team of filterTeams(); track team.id) {
-      <option [value]="team.id">{{ team.name }}</option>
+    <option [value]="team.id">{{ team.name }}</option>
     }
   </select>
 </div>
 
 @if (filteredPlayers().length === 0) {
-  <p>Nema igrača za izabrane filtere.</p>
+<p>Nema igrača za izabrane filtere.</p>
 } @else {
-  <table>
-    <thead>
-      <tr>
-        <th>Igrač</th>
-        @if (seasonFilterId()) { <th>Tim u sezoni</th> }
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (player of filteredPlayers(); track player.id) {
-        <tr>
-          <td class="row-with-avatar">
-            <span class="avatar avatar--sm">
-              @if (player.photoUrl) {
-                <img [src]="player.photoUrl" alt="" />
-              } @else {
-                {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
-              }
-            </span>
-            {{ player.firstName }} {{ player.lastName }}
-          </td>
-          @if (seasonFilterId()) { <td>{{ player.teamName ?? '—' }}</td> }
-          <td>
-            <button type="button" (click)="startEditPlayer(player)">Izmeni</button>
-            <button type="button" (click)="deletePlayer(player.id)">Obriši trajno</button>
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
+<table>
+  <thead>
+    <tr>
+      <th>Igrač</th>
+      @if (seasonFilterId()) { <th>Tim u sezoni</th> }
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (player of filteredPlayers(); track player.id) {
+    <tr>
+      <td class="row-with-avatar">
+        <app-editable-avatar shape="circle" [imageUrl]="player.photoUrl"
+          [fallbackText]="player.firstName.charAt(0) + player.lastName.charAt(0)"
+          (imageChanged)="onPhotoChanged(player, $event)" (failed)="onImageFailed($event)" />
+        {{ player.firstName }} {{ player.lastName }}
+      </td>
+      @if (seasonFilterId()) { <td>{{ player.teamName ?? '—' }}</td> }
+      <td>
+        <button type="button" (click)="startEditPlayer(player)">Izmeni</button>
+        <button type="button" (click)="deletePlayer(player.id)">Obriši trajno</button>
+      </td>
+    </tr>
+    }
+  </tbody>
+</table>
 }

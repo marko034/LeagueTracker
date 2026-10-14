@@ -1,0 +1,43 @@
+<div class="image-upload"
+     [class.image-upload--dragging]="dragging()"
+     (dragover)="onDragOver($event)"
+     (dragleave)="dragging.set(false)"
+     (drop)="onDrop($event)">
+
+  <div class="image-upload__preview" [class.image-upload__preview--circle]="shape() === 'circle'">
+    @if (value(); as url) {
+      <img [src]="url" alt="" />
+    } @else {
+      <span>{{ fallbackText() || '+' }}</span>
+    }
+
+    @if (uploading()) {
+      <div class="image-upload__busy">Šaljem…</div>
+    }
+  </div>
+
+  <div class="image-upload__actions">
+    <input #fileInput type="file" accept="image/jpeg,image/png,image/webp" hidden
+           (change)="onFileSelected($event)" />
+
+    <div class="image-upload__buttons">
+      <button type="button" class="image-upload__pick"
+              [disabled]="uploading() || disabled()"
+              (click)="openPicker(fileInput)">
+        {{ value() ? 'Promeni sliku' : 'Dodaj sliku' }}
+      </button>
+
+      @if (value()) {
+        <button type="button" class="image-upload__remove"
+                [disabled]="uploading() || disabled()"
+                (click)="remove()">Ukloni</button>
+      }
+    </div>
+
+    <small>JPG, PNG ili WebP, do 5 MB. Sliku možete i prevući ovde.</small>
+
+    @if (error()) {
+      <small class="image-upload__error">{{ error() }}</small>
+    }
+  </div>
+</div>

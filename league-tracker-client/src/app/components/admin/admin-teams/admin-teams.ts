@@ -1,25 +1,24 @@
 import { Component, inject, signal } from '@angular/core';
-import { Upload } from '../../../services/upload';
 import { TeamService } from '../../../services/team';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Team } from '../../../models/team';
 import { AdminFeedbackService } from '../../../services/admin-feedback';
 import { SeasonService } from '../../../services/season';
+import { EditableAvatar } from '../../shared/editable-avatar/editable-avatar';
+import { ImageUpload } from '../../shared/image-upload/image-upload';
 
 @Component({
   selector: 'app-admin-teams',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, EditableAvatar, ImageUpload],
   templateUrl: './admin-teams.html',
   styleUrl: './admin-teams.scss',
 })
 export class AdminTeams {
   private teamService = inject(TeamService);
-  private uploadService = inject(Upload);
   private feedback = inject(AdminFeedbackService);
   private seasonService = inject(SeasonService);
 
   loading = signal(false);
-  teamLogoUploading = signal(false);
   editingTeamId = signal<number | null>(null);
   selectedTeamIdForPlayers = signal<number | null>(null);
   allTeams = signal<Team[]>([]);
@@ -28,35 +27,17 @@ export class AdminTeams {
 
   teamForm = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    logoUrl: new FormControl('', { nonNullable: true }),
+    logoUrl: new FormControl<string | null>(null)
   });
 
-  constructor(){
+  constructor() {
     this.loadAllTeams();
-  }
-
-  onTeamLogoSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    this.teamLogoUploading.set(true);
-    this.uploadService.uploadFile(file).subscribe({
-      next: result => {
-        this.teamForm.patchValue({ logoUrl: result.url });
-        this.teamLogoUploading.set(false);
-      },
-      error: (err) => {
-        this.feedback.error(err, 'Upload slike nije uspeo.');
-        this.teamLogoUploading.set(false);
-      }
-    });
   }
 
   startEditTeam(team: Team) {
     this.editingTeamId.set(team.id);
-    this.teamForm.patchValue({ name: team.name, logoUrl: team.logoUrl ?? '' });
-    //this.activeTab.set('new-team');
+    this.teamForm.patchValue({ name: team.name, logoUrl: team.logoUrl });
+    this.scrollToForm();
   }
 
   cancelEditTeam() {
@@ -71,7 +52,7 @@ export class AdminTeams {
     }
 
     const value = this.teamForm.getRawValue();
-    const dto = { name: value.name, logoUrl: value.logoUrl || null };
+    const dto = { name: value.name, logoUrl: value.logoUrl };
 
     const editingId = this.editingTeamId();
     const request = editingId
@@ -105,8 +86,26 @@ export class AdminTeams {
     this.teamService.getRaw().subscribe(t => this.allTeams.set(t));
   }
 
-   private reloadSeasonTeams() {
+  private reloadSeasonTeams() {
     const seasonId = this.seasonService.selectedId();
     if (seasonId) this.teamService.loadBySeason(seasonId);
+  }
+
+  onLogoChanged(team: Team, url: string) {
+    this.teamService.update(team.id, { name: team.name, logoUrl: url }).subscribe({
+      next: () => {
+        this.feedback.success(`Logo tima „${team.name}“ je sačuvan.`);
+        this.loadAllTeams();
+      },
+      error: err => this.feedback.error(err, 'Čuvanje logoa nije uspelo.')
+    });
+  }
+
+  onImageFailed(message: string) {
+    this.feedback.error(null, message);
+  }
+
+  private scrollToForm() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

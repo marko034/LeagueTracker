@@ -4,7 +4,7 @@ import { inject, Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root',
 })
-export class  Upload {
+export class  UploadService {
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:5296/api/uploads';
 

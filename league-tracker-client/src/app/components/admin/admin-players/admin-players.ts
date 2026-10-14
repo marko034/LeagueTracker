@@ -2,30 +2,29 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Player } from '../../../models/player';
 import { PlayerService } from '../../../services/player';
-import { Upload } from '../../../services/upload';
 import { SeasonService } from '../../../services/season';
 import { AdminFeedbackService } from '../../../services/admin-feedback';
 import { TeamService } from '../../../services/team';
 import { Team } from '../../../models/team';
+import { EditableAvatar } from '../../shared/editable-avatar/editable-avatar';
+import { DateTimePicker } from '../../shared/date-time-picker/date-time-picker';
+import { ImageUpload } from '../../shared/image-upload/image-upload';
 
 @Component({
   selector: 'app-admin-players',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, EditableAvatar, DateTimePicker, ImageUpload],
   templateUrl: './admin-players.html',
   styleUrl: './admin-players.scss',
 })
 export class AdminPlayers {
   private playerService = inject(PlayerService);
-  private uploadService = inject(Upload);
   private seasonService = inject(SeasonService);
   private feedback = inject(AdminFeedbackService);
   private teamService = inject(TeamService);
 
   loading = signal(false);
-  playerPhotoUploading = signal(false);
   editingPlayerId = signal<number | null>(null);
   selectedTeamIdForPlayers = signal<number | null>(null);
-  photoUploading = signal(false);
 
   teams = this.teamService.teams;
   search = signal('');
@@ -33,6 +32,7 @@ export class AdminPlayers {
   playerForm = new FormGroup({
     firstName: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     lastName: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    dateOfBirth: new FormControl<string | null>(null),
     photoUrl: new FormControl<string | null>(null)
   });
 
@@ -89,32 +89,15 @@ export class AdminPlayers {
     request.subscribe(p => this.players.set(p));
   }
 
-  onPlayerPhotoSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    this.playerPhotoUploading.set(true);
-    this.uploadService.uploadFile(file).subscribe({
-      next: result => {
-        this.playerForm.patchValue({ photoUrl: result.url });
-        this.playerPhotoUploading.set(false);
-      },
-      error: (err) => {
-        this.feedback.error(err, 'Upload slike nije uspeo.');
-        this.playerPhotoUploading.set(false);
-      }
-    });
-  }
-
   startEditPlayer(player: Player) {
     this.editingPlayerId.set(player.id);
     this.playerForm.patchValue({
       firstName: player.firstName,
       lastName: player.lastName,
+      dateOfBirth: player.dateOfBirth ? player.dateOfBirth.slice(0, 10) : null,
       photoUrl: player.photoUrl
     });
-    //this.activeTab.set('new-player');
+    this.scrollToForm();
   }
 
   cancelEditPlayer() {
@@ -133,7 +116,7 @@ export class AdminPlayers {
       firstName: value.firstName,
       lastName: value.lastName,
       photoUrl: value.photoUrl,
-      dateOfBirth: null
+      dateOfBirth: value.dateOfBirth || null
     };
 
     const editingId = this.editingPlayerId();
@@ -182,4 +165,26 @@ export class AdminPlayers {
     });
   }
 
+  onPhotoChanged(player: Player, url: string) {
+    this.playerService.update(player.id, {
+      firstName: player.firstName,
+      lastName: player.lastName,
+      photoUrl: url,
+      dateOfBirth: player.dateOfBirth ? player.dateOfBirth.slice(0, 10) : null
+    }).subscribe({
+      next: () => {
+        this.feedback.success(`Slika igrača ${player.firstName} ${player.lastName} je sačuvana.`);
+        this.reload();
+      },
+      error: err => this.feedback.error(err, 'Čuvanje slike nije uspelo.')
+    });
+  }
+
+  onImageFailed(message: string) {
+    this.feedback.error(null, message);
+  }
+
+  private scrollToForm() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }

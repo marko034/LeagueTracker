@@ -2,16 +2,8 @@
     <fieldset>
         <legend>{{ editingTeamId() ? 'Izmeni tim' : 'Novi tim' }}</legend>
         <label>Naziv <input type="text" formControlName="name" /></label>
-        <label>
-            Logo tima
-            <input type="file" accept="image/*" (change)="onTeamLogoSelected($event)" />
-        </label>
-        @if (teamLogoUploading()) {
-        <p>Upload u toku...</p>
-        }
-        @if (teamForm.value.logoUrl) {
-        <img [src]="teamForm.value.logoUrl" width="60" alt="" />
-        }
+        <label>Logo tima</label>
+        <app-image-upload formControlName="logoUrl" [fallbackText]="teamForm.value.name?.charAt(0) ?? ''" />
     </fieldset>
 
     <button type="submit">{{ editingTeamId() ? 'Sačuvaj izmene' : 'Kreiraj tim' }}</button>
@@ -32,13 +24,8 @@
         @for (team of allTeams(); track team.id) {
         <tr>
             <td class="row-with-avatar">
-                <span class="avatar avatar--sm">
-                    @if (team.logoUrl) {
-                    <img [src]="team.logoUrl" alt="" />
-                    } @else {
-                    {{ team.name.charAt(0) }}
-                    }
-                </span>
+                <app-editable-avatar shape="square" [imageUrl]="team.logoUrl" [fallbackText]="team.name.charAt(0)"
+                    (imageChanged)="onLogoChanged(team, $event)" (failed)="onImageFailed($event)" />
                 {{ team.name }}
             </td>
             <td>

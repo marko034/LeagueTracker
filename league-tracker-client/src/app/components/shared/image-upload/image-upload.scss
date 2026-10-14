@@ -1,0 +1,87 @@
+.image-upload {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.image-upload--dragging {
+  border-color: var(--accent);
+  background: rgba(87, 171, 90, 0.08);
+}
+
+.image-upload__preview {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-hover);
+  color: var(--mist);
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+}
+
+.image-upload__preview--circle {
+  border-radius: 50%;
+}
+
+.image-upload__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-upload__busy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+}
+
+.image-upload__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.image-upload__buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.image-upload__pick {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.image-upload__pick:hover:not(:disabled) {
+  background: var(--accent);
+  color: #15291a;
+}
+
+.image-upload__remove {
+  border-color: transparent;
+  color: var(--mist);
+}
+
+small {
+  color: var(--mist);
+}
+
+.image-upload__error {
+  color: #e86a7a;
+}

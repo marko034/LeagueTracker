@@ -1,0 +1,48 @@
+:host {
+  display: inline-block;
+}
+
+.editable-avatar {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--surface-hover);
+  color: var(--mist);
+  font-family: var(--font-display);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.editable-avatar--square {
+  border-radius: 10px;
+}
+
+.editable-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editable-avatar__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.editable-avatar:hover .editable-avatar__overlay,
+.editable-avatar:focus-visible .editable-avatar__overlay,
+.editable-avatar:disabled .editable-avatar__overlay {
+  opacity: 1;
+}

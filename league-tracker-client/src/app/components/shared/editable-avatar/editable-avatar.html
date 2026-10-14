@@ -1,0 +1,15 @@
+<button type="button" class="editable-avatar"
+        [class.editable-avatar--square]="shape() === 'square'"
+        [disabled]="busy()"
+        [title]="imageUrl() ? 'Promeni sliku' : 'Dodaj sliku'"
+        (click)="fileInput.click()">
+  @if (imageUrl(); as url) {
+    <img [src]="url" alt="" />
+  } @else {
+    <span>{{ fallbackText() }}</span>
+  }
+  <span class="editable-avatar__overlay">{{ busy() ? '…' : (imageUrl() ? 'Promeni' : 'Dodaj') }}</span>
+</button>
+
+<input #fileInput type="file" accept="image/jpeg,image/png,image/webp" hidden
+       (change)="onFileSelected($event)" />
