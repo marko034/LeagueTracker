@@ -4,10 +4,11 @@ import { PlayerService } from '../../services/player';
 import { Team, TeamHistoryEntry } from '../../models/team';
 import { RouterLink } from '@angular/router';
 import { SeasonService } from '../../services/season';
+import { MediaUrlPipe } from '../../pipes/media-url';
 
 @Component({
   selector: 'app-team-detail',
-  imports: [RouterLink],
+  imports: [RouterLink, MediaUrlPipe],
   templateUrl: './team-detail.html',
   styleUrl: './team-detail.scss',
 })

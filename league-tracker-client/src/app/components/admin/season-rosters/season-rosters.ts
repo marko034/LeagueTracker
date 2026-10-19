@@ -6,10 +6,11 @@ import { Team } from '../../../models/team';
 import { AdminFeedbackService } from '../../../services/admin-feedback';
 import { PlayerService } from '../../../services/player';
 import { TeamService } from '../../../services/team';
+import { MediaUrlPipe } from '../../../pipes/media-url';
 
 @Component({
   selector: 'app-season-rosters',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, MediaUrlPipe],
   templateUrl: './season-rosters.html',
   styleUrl: './season-rosters.scss'
 })

@@ -7,7 +7,7 @@
 <div class="row-with-avatar" style="margin-bottom: 1rem;">
   <span class="avatar avatar--lg">
     @if (p.photoUrl) {
-    <img [src]="p.photoUrl" [alt]="p.firstName" />
+    <img [src]="p.photoUrl | mediaUrl" [alt]="p.firstName" />
     } @else {
     {{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}
     }

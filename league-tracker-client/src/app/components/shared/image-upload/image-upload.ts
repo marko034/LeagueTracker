@@ -2,11 +2,13 @@ import { Component, forwardRef, inject, input, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { UploadService } from '../../../services/upload';
 import { uploadErrorMessage, validateImageFile } from '../../../utils/image-file';
+import { MediaUrlPipe } from '../../../pipes/media-url';
 
 @Component({
   selector: 'app-image-upload',
   templateUrl: './image-upload.html',
   styleUrl: './image-upload.scss',
+  imports: [MediaUrlPipe],
   providers: [
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ImageUpload), multi: true }
   ]
@@ -23,8 +25,8 @@ export class ImageUpload implements ControlValueAccessor {
   disabled = signal(false);
   error = signal<string | null>(null);
 
-  private onChange: (value: string | null) => void = () => {};
-  private onTouched: () => void = () => {};
+  private onChange: (value: string | null) => void = () => { };
+  private onTouched: () => void = () => { };
 
   writeValue(value: string | null): void {
     this.value.set(value || null);
@@ -93,10 +95,11 @@ export class ImageUpload implements ControlValueAccessor {
 
     this.uploadService.uploadFile(file).subscribe({
       next: result => {
-        this.value.set(result.url);
+        this.value.set(result.path);
         this.uploading.set(false);
-        this.onChange(result.url);
+        this.onChange(result.path);
         this.onTouched();
+
       },
       error: err => {
         this.uploading.set(false);

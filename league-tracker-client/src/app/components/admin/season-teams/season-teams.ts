@@ -3,10 +3,11 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Team } from '../../../models/team';
 import { AdminFeedbackService } from '../../../services/admin-feedback';
 import { TeamService } from '../../../services/team';
+import { MediaUrlPipe } from '../../../pipes/media-url';
 
 @Component({
   selector: 'app-season-teams',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, MediaUrlPipe],
   templateUrl: './season-teams.html',
   styleUrl: './season-teams.scss'
 })

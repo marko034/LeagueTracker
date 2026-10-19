@@ -5,10 +5,11 @@ import { MatchService } from '../../services/match-service';
 import { MatchHub } from '../../services/match-hub';
 import { AuthService } from '../../services/auth-service';
 import { SeasonService } from '../../services/season';
+import { MediaUrlPipe } from '../../pipes/media-url';
 
 @Component({
   selector: 'app-match-list',
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, MediaUrlPipe],
   templateUrl: './match-list.html',
   styleUrl: './match-list.scss',
 })

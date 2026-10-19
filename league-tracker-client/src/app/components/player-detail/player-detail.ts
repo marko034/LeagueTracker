@@ -7,10 +7,11 @@ import { PlayerStatsService } from '../../services/player-stats-service';
 import { SeasonService } from '../../services/season';
 import { PlayerStatsDetail } from '../../models/player-stats-detail';
 import { StatDonutChart } from '../stat-donut-chart/stat-donut-chart';
+import { MediaUrlPipe } from '../../pipes/media-url';
 
 @Component({
   selector: 'app-player-detail',
-  imports: [RouterLink, DatePipe, StatDonutChart],
+  imports: [RouterLink, DatePipe, StatDonutChart, MediaUrlPipe],
   templateUrl: './player-detail.html',
   styleUrl: './player-detail.scss',
 })

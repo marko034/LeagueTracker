@@ -2,10 +2,11 @@ import { Component, inject, OnInit, effect } from '@angular/core';
 import { StandingsService } from '../../services/standings-service';
 import { MatchHub } from '../../services/match-hub';
 import { SeasonService } from '../../services/season';
+import { MediaUrlPipe } from '../../pipes/media-url';
 
 @Component({
   selector: 'app-standings',
-  imports: [],
+  imports: [MediaUrlPipe],
   templateUrl: './standings.html',
   styleUrl: './standings.scss',
 })

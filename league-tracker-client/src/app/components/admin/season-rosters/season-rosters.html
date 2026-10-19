@@ -40,7 +40,7 @@
             <td class="row-with-avatar">
               <span class="avatar avatar--sm">
                 @if (player.photoUrl) {
-                  <img [src]="player.photoUrl" alt="" />
+                  <img [src]="player.photoUrl | mediaUrl" alt="" />
                 } @else {
                   {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
                 }

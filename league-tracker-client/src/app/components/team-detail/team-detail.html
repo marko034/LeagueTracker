@@ -2,7 +2,7 @@
   <div class="team-header">
     <span class="avatar avatar--lg">
       @if (t.logoUrl) {
-        <img [src]="t.logoUrl" [alt]="t.name" />
+        <img [src]="t.logoUrl | mediaUrl" [alt]="t.name" />
       } @else {
         {{ t.name.charAt(0) }}
       }
@@ -26,7 +26,7 @@
       <a [routerLink]="['/players', player.id]" class="player-card">
         <span class="avatar avatar--md">
           @if (player.photoUrl) {
-            <img [src]="player.photoUrl" [alt]="player.firstName" />
+            <img [src]="player.photoUrl | mediaUrl" [alt]="player.firstName" />
           } @else {
             {{ player.firstName.charAt(0) }}{{ player.lastName.charAt(0) }}
           }

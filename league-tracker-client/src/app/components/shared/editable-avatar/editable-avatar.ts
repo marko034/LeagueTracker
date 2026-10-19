@@ -1,11 +1,13 @@
 import { Component, inject, input, output, signal } from '@angular/core';
 import { UploadService } from '../../../services/upload';
 import { uploadErrorMessage, validateImageFile } from '../../../utils/image-file';
+import { MediaUrlPipe } from '../../../pipes/media-url';
 
 @Component({
   selector: 'app-editable-avatar',
   templateUrl: './editable-avatar.html',
-  styleUrl: './editable-avatar.scss'
+  styleUrl: './editable-avatar.scss',
+  imports:[MediaUrlPipe]
 })
 export class EditableAvatar {
   private uploadService = inject(UploadService);
@@ -39,7 +41,7 @@ export class EditableAvatar {
     this.uploadService.uploadFile(file).subscribe({
       next: result => {
         this.busy.set(false);
-        this.imageChanged.emit(result.url);
+        this.imageChanged.emit(result.path);
       },
       error: err => {
         this.busy.set(false);

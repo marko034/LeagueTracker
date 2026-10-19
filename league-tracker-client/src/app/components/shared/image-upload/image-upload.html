@@ -6,7 +6,7 @@
 
   <div class="image-upload__preview" [class.image-upload__preview--circle]="shape() === 'circle'">
     @if (value(); as url) {
-      <img [src]="url" alt="" />
+      <img [src]="url | mediaUrl" alt="" />
     } @else {
       <span>{{ fallbackText() || '+' }}</span>
     }

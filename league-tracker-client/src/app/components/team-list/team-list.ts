@@ -2,10 +2,11 @@ import { Component, effect, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TeamService } from '../../services/team';
 import { SeasonService } from '../../services/season';
+import { MediaUrlPipe } from '../../pipes/media-url';
 
 @Component({
   selector: 'app-team-list',
-  imports: [RouterLink],
+  imports: [RouterLink, MediaUrlPipe],
   templateUrl: './team-list.html',
   styleUrl: './team-list.scss',
 })

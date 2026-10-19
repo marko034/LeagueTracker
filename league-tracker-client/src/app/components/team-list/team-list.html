@@ -10,7 +10,7 @@
       <a [routerLink]="['/teams', team.id]" class="team-card">
         <span class="avatar avatar--lg">
           @if (team.logoUrl) {
-            <img [src]="team.logoUrl" [alt]="team.name" />
+            <img [src]="team.logoUrl | mediaUrl" [alt]="team.name" />
           } @else {
             {{ team.name.charAt(0) }}
           }

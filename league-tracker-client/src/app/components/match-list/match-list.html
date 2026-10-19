@@ -23,7 +23,7 @@
                 <span class="row-with-avatar">
                     <span class="avatar avatar--sm">
                         @if (match.homeTeamLogoUrl) {
-                        <img [src]="match.homeTeamLogoUrl" [alt]="match.homeTeamName" />
+                        <img [src]="match.homeTeamLogoUrl | mediaUrl" [alt]="match.homeTeamName" />
                         } @else {
                         {{ match.homeTeamName.charAt(0) }}
                         }
@@ -35,7 +35,7 @@
                 <span class="row-with-avatar">
                     <span class="avatar avatar--sm">
                         @if (match.awayTeamLogoUrl) {
-                        <img [src]="match.awayTeamLogoUrl" [alt]="match.awayTeamName" />
+                        <img [src]="match.awayTeamLogoUrl | mediaUrl" [alt]="match.awayTeamName" />
                         } @else {
                         {{ match.awayTeamName.charAt(0) }}
                         }

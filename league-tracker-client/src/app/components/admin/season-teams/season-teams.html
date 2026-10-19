@@ -27,7 +27,7 @@
         <tr>
           <td class="row-with-avatar">
             <span class="avatar avatar--sm">
-              @if (team.logoUrl) { <img [src]="team.logoUrl" alt="" /> } @else { {{ team.name.charAt(0) }} }
+              @if (team.logoUrl) { <img [src]="team.logoUrl | mediaUrl" alt="" /> } @else { {{ team.name.charAt(0) }} }
             </span>
             {{ team.name }}
           </td>
