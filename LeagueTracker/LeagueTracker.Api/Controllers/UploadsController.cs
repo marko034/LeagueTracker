@@ -1,55 +1,46 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using LeagueTracker.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LeagueTracker.Api.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 [Authorize(Roles = "Admin")]
 public class UploadsController : ControllerBase
 {
-    private readonly IWebHostEnvironment _webHostEnvironment;
+    private static readonly string[] AllowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+    private const long MaxBytes = 5 * 1024 * 1024;
 
-    public UploadsController(IWebHostEnvironment webHostEnvironment)
+    private readonly IFileStorage _fileStorage;
+
+    public UploadsController(IFileStorage fileStorage)
     {
-        _webHostEnvironment = webHostEnvironment;
+        _fileStorage = fileStorage;
     }
 
     [HttpPost("image")]
-    public async Task<ActionResult<string>> UploadImage(IFormFile file)
+    public async Task<IActionResult> UploadImage(IFormFile file, CancellationToken cancellationToken)
     {
         if (file.Length == 0)
         {
-            return BadRequest("Fajl je prazan");
+            return BadRequest("Fajl je prazan.");
         }
 
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
-
-        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
-        if (!allowedExtensions.Contains(extension))
-        {
-            return BadRequest("Dozvoljeni formati su: .jpg, .jpeg, .png, .webp");
-        }
-
-        if (file.Length > 5 * 1024 * 1024)
+        if (file.Length > MaxBytes)
         {
             return BadRequest("Fajl je prevelik (max 5 MB).");
         }
 
-        var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-
-        Directory.CreateDirectory(uploadsFolder);
-
-        var fileName = $"{Guid.NewGuid}{extension}";
-        var filePath = Path.Combine(uploadsFolder, fileName);
-
-        using(var stream = new FileStream(filePath, FileMode.Create))
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!AllowedExtensions.Contains(extension))
         {
-            await file.CopyToAsync(stream);
+            return BadRequest("Dozvoljeni formati: jpg, jpeg, png, webp.");
         }
 
-        var url = $"{Request.Scheme}://{Request.Host}/uploads/{fileName}";
-        return Ok(new { url });
+        await using var stream = file.OpenReadStream();
+        var path = await _fileStorage.SaveAsync(stream, extension, cancellationToken);
+
+        return Ok(new { path });
     }
 }

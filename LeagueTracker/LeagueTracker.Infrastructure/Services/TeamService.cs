@@ -1,5 +1,6 @@
 ﻿
 
+using LeagueTracker.Application.Common;
 using LeagueTracker.Application.DTOs.Teams;
 using LeagueTracker.Application.Exceptions;
 using LeagueTracker.Application.Interfaces;
@@ -13,11 +14,13 @@ public class TeamService : ITeamService
 {
     private readonly LeagueTrackerDbContext _context;
     private readonly IStandingsService _standingsService;
+    private readonly IFileStorage _fileStorage;
 
-    public TeamService(LeagueTrackerDbContext context, IStandingsService standingsService)
+    public TeamService(LeagueTrackerDbContext context, IStandingsService standingsService, IFileStorage fileStorage)
     {
         _context = context;
         _standingsService = standingsService;
+        _fileStorage = fileStorage;
     }
 
     public async Task<TeamDto> CreateAsync(CreateTeamDto dto)
@@ -25,7 +28,7 @@ public class TeamService : ITeamService
         var team = new Team
         {
             Name = dto.Name,
-            LogoUrl = dto.LogoUrl
+            LogoUrl = UploadPath.Normalize(dto.LogoUrl)
         };
 
         _context.Teams.Add(team);
@@ -49,6 +52,9 @@ public class TeamService : ITeamService
 
         _context.Teams.Remove(team);
         await _context.SaveChangesAsync();
+
+        await _fileStorage.DeleteAsync(team.LogoUrl);
+
         return true;
     }
 
@@ -173,10 +179,18 @@ public class TeamService : ITeamService
             return null;
         }
 
+        var newLogo = UploadPath.Normalize(dto.LogoUrl);
+        var oldLogo = team.LogoUrl;
+
         team.Name = dto.Name;
-        team.LogoUrl = dto.LogoUrl;
+        team.LogoUrl = newLogo;
 
         await _context.SaveChangesAsync();
+
+        if (oldLogo != newLogo)
+        {
+            await _fileStorage.DeleteAsync(oldLogo);
+        }
 
         return new TeamDto { Id = team.Id, Name = team.Name, LogoUrl = team.LogoUrl };
     }

@@ -45,7 +45,7 @@ public class PlayersController : ControllerBase
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpPut("id")]
+    [HttpPut("{id}")]
     public async Task<ActionResult<PlayerDto>> Update(int id, CreatePlayerDto playerDto)
     {
         var updated = await _playerService.UpdateAsync(id, playerDto);

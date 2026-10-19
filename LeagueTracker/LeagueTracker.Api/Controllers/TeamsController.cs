@@ -28,6 +28,7 @@ namespace LeagueTracker.Api.Controllers
             return team is null ? NotFound() : Ok(team);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<TeamDto>> Create(CreateTeamDto createTeamDto)
         {
@@ -44,7 +45,7 @@ namespace LeagueTracker.Api.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("id")]
+        [HttpPut("{id}")]
         public async Task<ActionResult<TeamDto>> Update(int id, CreateTeamDto teamDto)
         {
             var updated = await _teamService.UpdateAsync(id, teamDto);

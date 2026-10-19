@@ -94,6 +94,9 @@ builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
 
 builder.Services.AddScoped<ILeagueService, LeagueService>();
 
+builder.Services.AddSingleton<IFileStorage, LocalFileStorage>();
+builder.Services.AddHostedService<OrphanedUploadsCleaner>();
+
 builder.Services.AddControllers();
 
 builder.Services.AddCors(options =>

@@ -1,5 +1,6 @@
 ﻿
 
+using LeagueTracker.Application.Common;
 using LeagueTracker.Application.DTOs.Players;
 using LeagueTracker.Application.Exceptions;
 using LeagueTracker.Application.Interfaces;
@@ -12,10 +13,12 @@ namespace LeagueTracker.Infrastructure.Services;
 public class PlayerService : IPlayerService
 {
     private readonly LeagueTrackerDbContext _context;
+    private readonly IFileStorage _fileStorage;
 
-    public PlayerService(LeagueTrackerDbContext context)
+    public PlayerService(LeagueTrackerDbContext context, IFileStorage fileStorage)
     {
         _context = context;
+        _fileStorage = fileStorage;
     }
 
     public async Task<List<PlayerDto>> GetAsync(int? teamId, int? seasonId)
@@ -76,7 +79,7 @@ public class PlayerService : IPlayerService
         {
             FirstName = dto.FirstName,
             LastName = dto.LastName,
-            PhotoUrl = dto.PhotoUrl,
+            PhotoUrl = UploadPath.Normalize(dto.PhotoUrl),
             DateOfBirth = dto.DateOfBirth
         };
 
@@ -90,12 +93,20 @@ public class PlayerService : IPlayerService
         var player = await _context.Players.FindAsync(id);
         if (player is null) return null;
 
+        var newPhoto = UploadPath.Normalize(dto.PhotoUrl);
+        var oldPhoto = player.PhotoUrl;
+
         player.FirstName = dto.FirstName;
         player.LastName = dto.LastName;
-        player.PhotoUrl = dto.PhotoUrl;
+        player.PhotoUrl = newPhoto;
         player.DateOfBirth = dto.DateOfBirth;
 
         await _context.SaveChangesAsync();
+
+        if(oldPhoto != newPhoto)
+        {
+            await _fileStorage.DeleteAsync(oldPhoto);
+        }
 
         return ToDto(player);
     }
@@ -119,6 +130,9 @@ public class PlayerService : IPlayerService
 
         _context.Players.Remove(player);
         await _context.SaveChangesAsync();
+
+        await _fileStorage.DeleteAsync(player.PhotoUrl);
+
         return true;
     }
 
