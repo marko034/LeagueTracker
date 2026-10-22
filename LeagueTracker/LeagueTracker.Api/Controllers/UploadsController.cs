@@ -9,16 +9,16 @@ namespace LeagueTracker.Api.Controllers;
 [Authorize(Roles = "Admin")]
 public class UploadsController : ControllerBase
 {
-    private static readonly string[] AllowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
     private const long MaxBytes = 5 * 1024 * 1024;
 
-    private readonly IFileStorage _fileStorage;
+    private readonly IImageService _imageService;
 
-    public UploadsController(IFileStorage fileStorage)
+    public UploadsController(IImageService imageService)
     {
-        _fileStorage = fileStorage;
+        _imageService = imageService;
     }
 
+    [RequestSizeLimit(MaxBytes + 512 * 1024)]
     [HttpPost("image")]
     public async Task<IActionResult> UploadImage(IFormFile file, CancellationToken cancellationToken)
     {
@@ -32,14 +32,8 @@ public class UploadsController : ControllerBase
             return BadRequest("Fajl je prevelik (max 5 MB).");
         }
 
-        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-        if (!AllowedExtensions.Contains(extension))
-        {
-            return BadRequest("Dozvoljeni formati: jpg, jpeg, png, webp.");
-        }
-
         await using var stream = file.OpenReadStream();
-        var path = await _fileStorage.SaveAsync(stream, extension, cancellationToken);
+        var path = await _imageService.ProcessAndSaveAsync(stream, cancellationToken);
 
         return Ok(new { path });
     }

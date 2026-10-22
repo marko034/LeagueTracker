@@ -1,4 +1,5 @@
-﻿using LeagueTracker.Application.Interfaces;
+﻿using LeagueTracker.Application.Common;
+using LeagueTracker.Application.Interfaces;
 using LeagueTracker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -67,26 +68,26 @@ public class OrphanedUploadsCleaner : BackgroundService
             .Select(p => p.PhotoUrl!)
             .ToListAsync(cancellationToken);
 
-        // Poredimo po imenu fajla, ne po celoj putanji: čak i ako negde ostane stara puna adresa,
-        // fajl se i dalje prepoznaje kao u upotrebi i ne briše se
-        var referenced = logos.Concat(photos)
-            .Select(Path.GetFileName)
+        var inUse = logos.Concat(photos)
+            .Select(ImageVariants.AssetId)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         var cutoff = DateTime.UtcNow - GracePeriod;
 
-        var orphans = _storage.List()
-            .Where(f => f.LastWriteUtc < cutoff && !referenced.Contains(Path.GetFileName(f.RelativePath)))
+        var orphanedAssets = _storage.List()
+            .GroupBy(file => ImageVariants.AssetId(file.RelativePath), StringComparer.OrdinalIgnoreCase)
+            .Where(group => !inUse.Contains(group.Key) && group.Max(file => file.LastWriteUtc) < cutoff)
             .ToList();
 
-        foreach (var file in orphans)
+        foreach (var asset in orphanedAssets)
         {
-            await _storage.DeleteAsync(file.RelativePath, cancellationToken);
+            _logger.LogInformation("Brišem neiskorišćenu sliku {AssetId}", asset.Key);
+            await _storage.DeleteAsync(asset.First().RelativePath, cancellationToken);
         }
 
-        if (orphans.Count > 0)
+        if (orphanedAssets.Count > 0)
         {
-            _logger.LogInformation("Obrisano {Count} neiskorišćenih slika.", orphans.Count);
+            _logger.LogInformation("Obrisano {Count} neiskorišćenih slika.", orphanedAssets.Count);
         }
     }
 }

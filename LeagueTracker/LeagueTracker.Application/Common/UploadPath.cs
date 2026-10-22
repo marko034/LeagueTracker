@@ -10,7 +10,13 @@ public static class UploadPath
         new (@"^/uploads/[A-Za-z0-9\-]{1,64}\.(jpg|jpeg|png|webp)$", 
             RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+    private static readonly Regex StoredFilePattern =
+        new(@"^/uploads/[A-Za-z0-9\-]{1,64}(_sm)?\.(jpg|jpeg|png|webp)$",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     public static bool IsValid(string path) => path is not null && Pattern.IsMatch(path);
+
+    public static bool IsStoredFile(string? path) => path is not null && StoredFilePattern.IsMatch(path);
 
     public static string? Normalize(string path)
     {

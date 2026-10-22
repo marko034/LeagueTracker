@@ -96,6 +96,7 @@ builder.Services.AddScoped<ILeagueService, LeagueService>();
 
 builder.Services.AddSingleton<IFileStorage, LocalFileStorage>();
 builder.Services.AddHostedService<OrphanedUploadsCleaner>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
 builder.Services.AddControllers();
 
@@ -142,7 +143,16 @@ app.UseAuthorization();
 
 app.UseExceptionHandler();
 
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = context =>
+    {
+        if (context.Context.Request.Path.StartsWithSegments("/uploads"))
+        {
+            context.Context.Response.Headers.CacheControl = "public,max-age=31536000,immutable";
+        }
+    }
+});
 
 app.MapControllers();
 
